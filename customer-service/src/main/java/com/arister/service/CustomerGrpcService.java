@@ -63,7 +63,7 @@ public class CustomerGrpcService extends CustomerServiceGrpc.CustomerServiceImpl
                     responseObserver,
                     CustomerResponse.newBuilder()
                             .setSuccess(false)
-                            .setMessage("Customer with that id_number already exists")
+                            .setMessage("Customer with that idNumber already exists")
                             .build());
             return;
         }

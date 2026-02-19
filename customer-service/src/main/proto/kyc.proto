@@ -14,45 +14,45 @@ enum KycVerificationStatus {
 
 message CustomerKyc {
   int64 id = 1;
-  int64 customer_id = 2;
-  string document_type = 3;
-  string document_number = 4;
-  string issue_date = 5;
-  string expiry_date = 6;
-  string issuing_country = 7;
-  string issuing_authority = 8;
-  KycVerificationStatus verification_status = 9;
-  string verified_at = 10;
-  string verified_by = 11;
-  string rejection_reason = 12;
+  int64 customerId = 2;
+  string documentType = 3;
+  string documentNumber = 4;
+  string issueDate = 5;
+  string expiryDate = 6;
+  string issuingCountry = 7;
+  string issuingAuthority = 8;
+  KycVerificationStatus verificationStatus = 9;
+  string verifiedAt = 10;
+  string verifiedBy = 11;
+  string rejectionReason = 12;
   string notes = 13;
-  string created_at = 14;
+  string createdAt = 14;
 }
 
 message AddCustomerKycRequest {
-  int64 customer_id = 1;
-  string document_type = 2;
-  string document_number = 3;
-  string issue_date = 4;
-  string expiry_date = 5;
-  string issuing_country = 6;
-  string issuing_authority = 7;
+  int64 customerId = 1;
+  string documentType = 2;
+  string documentNumber = 3;
+  string issueDate = 4;
+  string expiryDate = 5;
+  string issuingCountry = 6;
+  string issuingAuthority = 7;
   string notes = 8;
 }
 
 message UpdateKycVerificationRequest {
-  int64 kyc_id = 1;
-  KycVerificationStatus verification_status = 2;
-  string verified_by = 3;
-  string rejection_reason = 4;
+  int64 kycId = 1;
+  KycVerificationStatus verificationStatus = 2;
+  string verifiedBy = 3;
+  string rejectionReason = 4;
 }
 
 message GetCustomerKycRequest {
-  int64 kyc_id = 1;
+  int64 kycId = 1;
 }
 
 message ListCustomerKycRequest {
-  int64 customer_id = 1;
+  int64 customerId = 1;
 }
 
 message CustomerKycResponse {
@@ -64,7 +64,7 @@ message CustomerKycResponse {
 message ListCustomerKycResponse {
   bool success = 1;
   string message = 2;
-  repeated CustomerKyc kyc_records = 3;
+  repeated CustomerKyc kycRecords = 3;
 }
 
 service CustomerKycService {

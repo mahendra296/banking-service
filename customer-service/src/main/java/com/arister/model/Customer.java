@@ -25,7 +25,7 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "customers")
 public class Customer extends BaseEntity {
 
-    @Column(name = "customer_code", unique = true)
+    @Column(name = "customer_code", insertable = false, updatable = false)
     private String customerCode;
 
     @Column(name = "first_name", nullable = false)
