@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.arister.proto";
+option java_outer_classname = "KycProto";
+
+package kyc;
+
+enum KycVerificationStatus {
+  PENDING = 0;
+  VERIFIED = 1;
+  REJECTED = 2;
+}
+
+message CustomerKyc {
+  int64 id = 1;
+  int64 customer_id = 2;
+  string document_type = 3;
+  string document_number = 4;
+  string issue_date = 5;
+  string expiry_date = 6;
+  string issuing_country = 7;
+  string issuing_authority = 8;
+  KycVerificationStatus verification_status = 9;
+  string verified_at = 10;
+  string verified_by = 11;
+  string rejection_reason = 12;
+  string notes = 13;
+  string created_at = 14;
+}
+
+message AddCustomerKycRequest {
+  int64 customer_id = 1;
+  string document_type = 2;
+  string document_number = 3;
+  string issue_date = 4;
+  string expiry_date = 5;
+  string issuing_country = 6;
+  string issuing_authority = 7;
+  string notes = 8;
+}
+
+message UpdateKycVerificationRequest {
+  int64 kyc_id = 1;
+  KycVerificationStatus verification_status = 2;
+  string verified_by = 3;
+  string rejection_reason = 4;
+}
+
+message GetCustomerKycRequest {
+  int64 kyc_id = 1;
+}
+
+message ListCustomerKycRequest {
+  int64 customer_id = 1;
+}
+
+message CustomerKycResponse {
+  bool success = 1;
+  string message = 2;
+  CustomerKyc kyc = 3;
+}
+
+message ListCustomerKycResponse {
+  bool success = 1;
+  string message = 2;
+  repeated CustomerKyc kyc_records = 3;
+}
+
+service CustomerKycService {
+  rpc AddCustomerKyc(AddCustomerKycRequest) returns (CustomerKycResponse);
+  rpc UpdateKycVerification(UpdateKycVerificationRequest) returns (CustomerKycResponse);
+  rpc GetCustomerKyc(GetCustomerKycRequest) returns (CustomerKycResponse);
+  rpc ListCustomerKyc(ListCustomerKycRequest) returns (ListCustomerKycResponse);
+}
