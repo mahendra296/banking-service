@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.arister.proto";
+option java_outer_classname = "AccountProto";
+
+package account;
+
+enum AccountType {
+  SAVINGS       = 0;
+  CURRENT       = 1;
+  FIXED_DEPOSIT = 2;
+}
+
+enum AccountStatus {
+  ACTIVE  = 0;
+  DORMANT = 1;
+  FROZEN  = 2;
+  CLOSED  = 3;
+}
+
+message Account {
+  int64         id             = 1;
+  string        accountNumber  = 2;
+  int64         customerId     = 3;
+  int64         branchId       = 4;
+  AccountType   accountType    = 5;
+  string        balance        = 6;
+  string        currency       = 7;
+  string        interestRate   = 8;
+  string        minBalance     = 9;
+  string        overdraftLimit = 10;
+  AccountStatus status         = 11;
+  string        closedAt       = 12;
+  string        createdAt      = 13;
+}
+
+message CreateAccountRequest {
+  int64       customerId     = 1;
+  int64       branchId       = 2;
+  AccountType accountType    = 3;
+  string      currency       = 4;
+  string      interestRate   = 5;
+  string      minBalance     = 6;
+  string      overdraftLimit = 7;
+}
+
+message GetAccountRequest {
+  int64 id = 1;
+}
+
+message GetAccountByNumberRequest {
+  string accountNumber = 1;
+}
+
+message UpdateAccountRequest {
+  int64         id             = 1;
+  string        interestRate   = 2;
+  string        minBalance     = 3;
+  string        overdraftLimit = 4;
+  AccountStatus status         = 5;
+}
+
+message DeleteAccountRequest {
+  int64 id = 1;
+}
+
+message ListAccountsRequest {
+  int32 page = 1;
+  int32 size = 2;
+}
+
+message ListAccountsByCustomerRequest {
+  int64 customerId = 1;
+}
+
+message AccountResponse {
+  bool    success = 1;
+  string  message = 2;
+  Account account = 3;
+}
+
+message DeleteAccountResponse {
+  bool   success = 1;
+  string message = 2;
+}
+
+message ListAccountsResponse {
+  bool             success    = 1;
+  string           message    = 2;
+  repeated Account accounts   = 3;
+  int32            totalCount = 4;
+  int32            page       = 5;
+  int32            size       = 6;
+}
+
+service AccountService {
+  rpc CreateAccount          (CreateAccountRequest)          returns (AccountResponse);
+  rpc GetAccount             (GetAccountRequest)             returns (AccountResponse);
+  rpc GetAccountByNumber     (GetAccountByNumberRequest)     returns (AccountResponse);
+  rpc UpdateAccount          (UpdateAccountRequest)          returns (AccountResponse);
+  rpc DeleteAccount          (DeleteAccountRequest)          returns (DeleteAccountResponse);
+  rpc ListAccounts           (ListAccountsRequest)           returns (ListAccountsResponse);
+  rpc ListAccountsByCustomer (ListAccountsByCustomerRequest) returns (ListAccountsResponse);
+}

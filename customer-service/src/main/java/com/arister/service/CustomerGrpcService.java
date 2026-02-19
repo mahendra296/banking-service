@@ -3,6 +3,7 @@ package com.arister.service;
 import com.arister.enums.CustomerStatus;
 import com.arister.enums.IdType;
 import com.arister.model.Customer;
+import com.arister.proto.AccountServiceGrpc;
 import com.arister.proto.CreateCustomerRequest;
 import com.arister.proto.CustomerResponse;
 import com.arister.proto.CustomerServiceGrpc;
@@ -10,6 +11,7 @@ import com.arister.proto.DeleteCustomerRequest;
 import com.arister.proto.DeleteCustomerResponse;
 import com.arister.proto.GetCustomerByCodeRequest;
 import com.arister.proto.GetCustomerRequest;
+import com.arister.proto.ListAccountsByCustomerRequest;
 import com.arister.proto.ListCustomersRequest;
 import com.arister.proto.ListCustomersResponse;
 import com.arister.proto.UpdateCustomerRequest;
@@ -17,6 +19,8 @@ import com.arister.repository.CustomerRepository;
 import io.grpc.stub.StreamObserver;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import net.devh.boot.grpc.client.inject.GrpcClient;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +32,9 @@ public class CustomerGrpcService extends CustomerServiceGrpc.CustomerServiceImpl
     private static final DateTimeFormatter DT_FMT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     private final CustomerRepository customerRepository;
+
+    @GrpcClient("account-service")
+    private AccountServiceGrpc.AccountServiceBlockingStub accountServiceStub;
 
     public CustomerGrpcService(CustomerRepository customerRepository) {
         this.customerRepository = customerRepository;
@@ -42,7 +49,7 @@ public class CustomerGrpcService extends CustomerServiceGrpc.CustomerServiceImpl
                     responseObserver,
                     CustomerResponse.newBuilder()
                             .setSuccess(false)
-                            .setMessage("first_name, last_name, and email are required")
+                            .setMessage("firstName, lastName, and email are required")
                             .build());
             return;
         }
@@ -99,13 +106,17 @@ public class CustomerGrpcService extends CustomerServiceGrpc.CustomerServiceImpl
         customerRepository
                 .findById(request.getId())
                 .ifPresentOrElse(
-                        customer -> respond(
-                                responseObserver,
-                                CustomerResponse.newBuilder()
-                                        .setSuccess(true)
-                                        .setMessage("Customer found")
-                                        .setCustomer(toProto(customer))
-                                        .build()),
+                        customer -> {
+                            List<com.arister.proto.Account> accounts = fetchAccounts(customer.getId());
+                            respond(
+                                    responseObserver,
+                                    CustomerResponse.newBuilder()
+                                            .setSuccess(true)
+                                            .setMessage("Customer found")
+                                            .setCustomer(toProto(customer))
+                                            .addAllAccounts(accounts)
+                                            .build());
+                        },
                         () -> respond(
                                 responseObserver,
                                 CustomerResponse.newBuilder()
@@ -119,13 +130,17 @@ public class CustomerGrpcService extends CustomerServiceGrpc.CustomerServiceImpl
         customerRepository
                 .findByCustomerCode(request.getCustomerCode())
                 .ifPresentOrElse(
-                        customer -> respond(
-                                responseObserver,
-                                CustomerResponse.newBuilder()
-                                        .setSuccess(true)
-                                        .setMessage("Customer found")
-                                        .setCustomer(toProto(customer))
-                                        .build()),
+                        customer -> {
+                            List<com.arister.proto.Account> accounts = fetchAccounts(customer.getId());
+                            respond(
+                                    responseObserver,
+                                    CustomerResponse.newBuilder()
+                                            .setSuccess(true)
+                                            .setMessage("Customer found")
+                                            .setCustomer(toProto(customer))
+                                            .addAllAccounts(accounts)
+                                            .build());
+                        },
                         () -> respond(
                                 responseObserver,
                                 CustomerResponse.newBuilder()
@@ -145,8 +160,7 @@ public class CustomerGrpcService extends CustomerServiceGrpc.CustomerServiceImpl
                             if (!request.getEmail().isBlank()) customer.setEmail(request.getEmail());
                             if (!request.getPhone().isBlank()) customer.setPhone(request.getPhone());
                             if (!request.getAddress().isBlank()) customer.setAddress(request.getAddress());
-                            customer.setStatus(
-                                    CustomerStatus.valueOf(request.getStatus().name()));
+                            customer.setStatus(CustomerStatus.valueOf(request.getStatus().name()));
                             Customer saved = customerRepository.save(customer);
                             respond(
                                     responseObserver,
@@ -201,6 +215,18 @@ public class CustomerGrpcService extends CustomerServiceGrpc.CustomerServiceImpl
         respond(responseObserver, builder.build());
     }
 
+    private List<com.arister.proto.Account> fetchAccounts(long customerId) {
+        try {
+            com.arister.proto.ListAccountsResponse response = accountServiceStub.listAccountsByCustomer(
+                    ListAccountsByCustomerRequest.newBuilder()
+                            .setCustomerId(customerId)
+                            .build());
+            return response.getSuccess() ? response.getAccountsList() : List.of();
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
     private com.arister.proto.Customer toProto(Customer customer) {
         com.arister.proto.Customer.Builder builder = com.arister.proto.Customer.newBuilder()
                 .setId(customer.getId())
@@ -221,12 +247,10 @@ public class CustomerGrpcService extends CustomerServiceGrpc.CustomerServiceImpl
             builder.setDateOfBirth(customer.getDateOfBirth().format(DATE_FMT));
         }
         if (customer.getIdType() != null) {
-            builder.setIdType(
-                    com.arister.proto.IdType.valueOf(customer.getIdType().name()));
+            builder.setIdType(com.arister.proto.IdType.valueOf(customer.getIdType().name()));
         }
         if (customer.getStatus() != null) {
-            builder.setStatus(com.arister.proto.CustomerStatus.valueOf(
-                    customer.getStatus().name()));
+            builder.setStatus(com.arister.proto.CustomerStatus.valueOf(customer.getStatus().name()));
         }
         if (customer.getBranchId() != null) {
             builder.setBranchId(customer.getBranchId());

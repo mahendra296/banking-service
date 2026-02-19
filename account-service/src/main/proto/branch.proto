@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.arister.proto";
+option java_outer_classname = "BranchProto";
+
+package branch;
+
+message Branch {
+  int64  id         = 1;
+  string branchCode = 2;
+  string branchName = 3;
+  string city       = 4;
+  string state      = 5;
+  string phone      = 6;
+  bool   isActive   = 7;
+  string createdAt  = 8;
+}
+
+message CreateBranchRequest {
+  string branchCode = 1;
+  string branchName = 2;
+  string city       = 3;
+  string state      = 4;
+  string phone      = 5;
+}
+
+message GetBranchRequest {
+  int64 id = 1;
+}
+
+message GetBranchByCodeRequest {
+  string branchCode = 1;
+}
+
+message UpdateBranchRequest {
+  int64  id         = 1;
+  string branchName = 2;
+  string city       = 3;
+  string state      = 4;
+  string phone      = 5;
+  bool   isActive   = 6;
+}
+
+message DeleteBranchRequest {
+  int64 id = 1;
+}
+
+message ListBranchesRequest {
+  int32 page = 1;
+  int32 size = 2;
+}
+
+message BranchResponse {
+  bool   success = 1;
+  string message = 2;
+  Branch branch  = 3;
+}
+
+message DeleteBranchResponse {
+  bool   success = 1;
+  string message = 2;
+}
+
+message ListBranchesResponse {
+  bool            success    = 1;
+  string          message    = 2;
+  repeated Branch branches   = 3;
+  int32           totalCount = 4;
+  int32           page       = 5;
+  int32           size       = 6;
+}
+
+service BranchService {
+  rpc CreateBranch    (CreateBranchRequest)    returns (BranchResponse);
+  rpc GetBranch       (GetBranchRequest)       returns (BranchResponse);
+  rpc GetBranchByCode (GetBranchByCodeRequest) returns (BranchResponse);
+  rpc UpdateBranch    (UpdateBranchRequest)    returns (BranchResponse);
+  rpc DeleteBranch    (DeleteBranchRequest)    returns (DeleteBranchResponse);
+  rpc ListBranches    (ListBranchesRequest)    returns (ListBranchesResponse);
+}

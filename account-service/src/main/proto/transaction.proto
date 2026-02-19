@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.arister.proto";
+option java_outer_classname = "TransactionProto";
+
+package transaction;
+
+enum TransactionType {
+  DEPOSIT      = 0;
+  WITHDRAWAL   = 1;
+  TRANSFER_IN  = 2;
+  TRANSFER_OUT = 3;
+  INTEREST     = 4;
+  FEE          = 5;
+  REVERSAL     = 6;
+}
+
+message Transaction {
+  int64           id              = 1;
+  string          transactionRef  = 2;
+  int64           accountId       = 3;
+  TransactionType transactionType = 4;
+  string          amount          = 5;
+  string          balanceBefore   = 6;
+  string          balanceAfter    = 7;
+  string          description     = 8;
+  int64           relatedTxnId    = 9;
+  int64           performedBy     = 10;
+  string          createdAt       = 11;
+}
+
+message DepositRequest {
+  int64  accountId   = 1;
+  string amount      = 2;
+  string description = 3;
+  int64  performedBy = 4;
+}
+
+message WithdrawRequest {
+  int64  accountId   = 1;
+  string amount      = 2;
+  string description = 3;
+  int64  performedBy = 4;
+}
+
+message GetTransactionRequest {
+  int64 id = 1;
+}
+
+message ListTransactionsByAccountRequest {
+  int64 accountId = 1;
+  int32 page      = 2;
+  int32 size      = 3;
+}
+
+message TransactionResponse {
+  bool        success     = 1;
+  string      message     = 2;
+  Transaction transaction = 3;
+}
+
+message ListTransactionsResponse {
+  bool                 success      = 1;
+  string               message      = 2;
+  repeated Transaction transactions = 3;
+  int32                totalCount   = 4;
+  int32                page         = 5;
+  int32                size         = 6;
+}
+
+service TransactionService {
+  rpc Deposit                   (DepositRequest)                   returns (TransactionResponse);
+  rpc Withdraw                  (WithdrawRequest)                  returns (TransactionResponse);
+  rpc GetTransaction            (GetTransactionRequest)            returns (TransactionResponse);
+  rpc ListTransactionsByAccount (ListTransactionsByAccountRequest) returns (ListTransactionsResponse);
+}

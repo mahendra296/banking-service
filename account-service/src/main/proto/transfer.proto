@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.arister.proto";
+option java_outer_classname = "TransferProto";
+
+package transfer;
+
+enum TransferStatus {
+  PENDING   = 0;
+  COMPLETED = 1;
+  FAILED    = 2;
+  REVERSED  = 3;
+}
+
+message Transfer {
+  int64          id            = 1;
+  string         transferRef   = 2;
+  int64          fromAccountId = 3;
+  int64          toAccountId   = 4;
+  string         amount        = 5;
+  string         fee           = 6;
+  TransferStatus status        = 7;
+  string         description   = 8;
+  string         createdAt     = 9;
+}
+
+message CreateTransferRequest {
+  int64  fromAccountId = 1;
+  int64  toAccountId   = 2;
+  string amount        = 3;
+  string fee           = 4;
+  string description   = 5;
+}
+
+message GetTransferRequest {
+  int64 id = 1;
+}
+
+message ListTransfersByAccountRequest {
+  int64 accountId = 1;
+  int32 page      = 2;
+  int32 size      = 3;
+}
+
+message TransferResponse {
+  bool     success  = 1;
+  string   message  = 2;
+  Transfer transfer = 3;
+}
+
+message ListTransfersResponse {
+  bool              success    = 1;
+  string            message    = 2;
+  repeated Transfer transfers  = 3;
+  int32             totalCount = 4;
+  int32             page       = 5;
+  int32             size       = 6;
+}
+
+service TransferService {
+  rpc CreateTransfer         (CreateTransferRequest)         returns (TransferResponse);
+  rpc GetTransfer            (GetTransferRequest)            returns (TransferResponse);
+  rpc ListTransfersByAccount (ListTransfersByAccountRequest) returns (ListTransfersResponse);
+}

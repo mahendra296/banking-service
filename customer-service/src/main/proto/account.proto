@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.arister.proto";
+option java_outer_classname = "AccountProto";
+
+package account;
+
+enum AccountType {
+  SAVINGS       = 0;
+  CURRENT       = 1;
+  FIXED_DEPOSIT = 2;
+}
+
+enum AccountStatus {
+  ACTIVE  = 0;
+  DORMANT = 1;
+  FROZEN  = 2;
+  CLOSED  = 3;
+}
+
+message Account {
+  int64         id             = 1;
+  string        accountNumber  = 2;
+  int64         customerId     = 3;
+  int64         branchId       = 4;
+  AccountType   accountType    = 5;
+  string        balance        = 6;
+  string        currency       = 7;
+  string        interestRate   = 8;
+  string        minBalance     = 9;
+  string        overdraftLimit = 10;
+  AccountStatus status         = 11;
+  string        closedAt       = 12;
+  string        createdAt      = 13;
+}
+
+message ListAccountsByCustomerRequest {
+  int64 customerId = 1;
+}
+
+message ListAccountsResponse {
+  bool             success    = 1;
+  string           message    = 2;
+  repeated Account accounts   = 3;
+  int32            totalCount = 4;
+  int32            page       = 5;
+  int32            size       = 6;
+}
+
+service AccountService {
+  rpc ListAccountsByCustomer (ListAccountsByCustomerRequest) returns (ListAccountsResponse);
+}

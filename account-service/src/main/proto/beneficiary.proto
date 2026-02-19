@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.arister.proto";
+option java_outer_classname = "BeneficiaryProto";
+
+package beneficiary;
+
+message Beneficiary {
+  int64  id              = 1;
+  int64  customerId      = 2;
+  string beneficiaryName = 3;
+  string accountNumber   = 4;
+  string bankName        = 5;
+  string ifscCode        = 6;
+  bool   isVerified      = 7;
+  string createdAt       = 8;
+}
+
+message AddBeneficiaryRequest {
+  int64  customerId      = 1;
+  string beneficiaryName = 2;
+  string accountNumber   = 3;
+  string bankName        = 4;
+  string ifscCode        = 5;
+}
+
+message GetBeneficiaryRequest {
+  int64 id = 1;
+}
+
+message UpdateBeneficiaryRequest {
+  int64  id              = 1;
+  string beneficiaryName = 2;
+  string bankName        = 3;
+  string ifscCode        = 4;
+  bool   isVerified      = 5;
+}
+
+message RemoveBeneficiaryRequest {
+  int64 id = 1;
+}
+
+message ListBeneficiariesRequest {
+  int64 customerId = 1;
+}
+
+message BeneficiaryResponse {
+  bool        success     = 1;
+  string      message     = 2;
+  Beneficiary beneficiary = 3;
+}
+
+message RemoveBeneficiaryResponse {
+  bool   success = 1;
+  string message = 2;
+}
+
+message ListBeneficiariesResponse {
+  bool                 success       = 1;
+  string               message       = 2;
+  repeated Beneficiary beneficiaries = 3;
+}
+
+service BeneficiaryService {
+  rpc AddBeneficiary    (AddBeneficiaryRequest)    returns (BeneficiaryResponse);
+  rpc GetBeneficiary    (GetBeneficiaryRequest)    returns (BeneficiaryResponse);
+  rpc UpdateBeneficiary (UpdateBeneficiaryRequest) returns (BeneficiaryResponse);
+  rpc RemoveBeneficiary (RemoveBeneficiaryRequest) returns (RemoveBeneficiaryResponse);
+  rpc ListBeneficiaries (ListBeneficiariesRequest) returns (ListBeneficiariesResponse);
+}

@@ -30,3 +30,8 @@ common-service/nul
 
 customer-service/.idea/*
 customer-service/target/*
+
+
+account-service/.idea/*
+account-service/target/*
+
