@@ -13,6 +13,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Generated;
+import org.hibernate.generator.EventType;
 
 @Data
 @SuperBuilder
@@ -23,7 +25,8 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "transactions")
 public class Transaction extends BaseEntity {
 
-    @Column(name = "transaction_ref", insertable = false, updatable = false)
+    @Generated(event = EventType.INSERT)
+    @Column(name = "transaction_ref", insertable = false, updatable = false, columnDefinition = "VARCHAR DEFAULT nextval('transaction_ref_seq')")
     private String transactionRef;
 
     @Column(name = "account_id", nullable = false)
